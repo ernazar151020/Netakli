@@ -1,0 +1,8 @@
+django
+Pillow
+djangorestframework
+djangorestframework_simplejwt
+python-decouple==3.4
+psycopg2-binary
+django-cors-headers
+drf-yasg
