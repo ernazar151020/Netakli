@@ -32,17 +32,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-async function loginUser(credentials, url) {
-  return fetch(`http://localhost:8000/api/v1/accounts/dj-rest-auth/${url}/`, {
-    method: "POST",
-    credentials: "omit",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(credentials),
-  }).then((data) => data);
-}
+// async function loginUser(credentials, url) {
+//   return fetch(`http://localhost:8000/api/v1/accounts/dj-rest-auth/${url}/`, {
+//     method: "POST",
+//     credentials: "omit",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Accept: "application/json",
+//     },
+//     body: JSON.stringify(credentials),
+//   }).then((data) => data);
+// }
 
 export default function SignIn({ setToken }) {
   const [username, setUsername] = useState("");
@@ -53,31 +53,26 @@ export default function SignIn({ setToken }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!username && !password) {
+      return setErrors("Поле не может быть пустыми");
+    }
     const token = http
       .post("accounts/login/", { username, password })
       .then((resp) => {
-        setResponse(resp);
-        console.log(resp);
+        localStorage.setItem("jwtToken", JSON.stringify(resp.data));
       })
+      .then(() => window.location.replace("/"))
       .catch((err) => {
-        console.log(err.response);
         setErrors(err.response.data.detail);
       });
-    // if (token.access && token.refresh) {
-    //   setToken(token);
-    //   window.location.replace("http://localhost:3000/");
-    // } else {
-    //   sessionStorage.clear();
-    //   if (token.non_field_errors) {
-    //     setResponse(
-    //       "Не возможно войти в систему с указанными учетными данными"
-    //     );
-    //   } else {
-    //     setResponse(token);
-    //   }
-    // }
   };
 
+  // useEffect(() => {
+  //   const local = localStorage.getItem("jwtToken");
+  //   console.log(JSON.parse(local));
+  // }, []);
+  const local = localStorage.getItem("jwtToken");
+  console.log(JSON.parse(local));
   const handleUsername = (e) => {
     setUsername(e.target.value);
   };
@@ -98,6 +93,7 @@ export default function SignIn({ setToken }) {
   };
   const classes = useStyles();
   // console.log(errors);
+
   return (
     <Wrapper>
       <div class="wrapper">
@@ -108,19 +104,19 @@ export default function SignIn({ setToken }) {
             autoComplete="off"
             onSubmit={handleSubmit}
           >
-            <p>{errors && errors}</p>
             <h1 className="form_title">
               <FaRegistered className="icon" />
               Netakli
             </h1>
-            {resp && (
+            {/* {resp && (
               <div className={"response"}>
                 <code>{JSON.stringify(resp.data)}</code>
               </div>
-            )}
+            )} */}
             <p className="form_text">Введите данные для входа</p>
+            <p className="signin_error">{errors ? errors : ""}</p>
             <Input
-              label={errors ? errors : "Ваше Имя"}
+              label="Ваше Имя"
               id="outlined-size-small"
               defaultValue=""
               variant="outlined"
@@ -134,7 +130,10 @@ export default function SignIn({ setToken }) {
               className={clsx(classes.margin, classes.textField)}
               variant="outlined"
             >
-              <InputLabel htmlFor="outlined-adornment-password">
+              <InputLabel
+                htmlFor="outlined-adornment-password"
+                error={errors ? true : false}
+              >
                 Введите пароль
               </InputLabel>
               <OutlinedInput
@@ -142,6 +141,7 @@ export default function SignIn({ setToken }) {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={handlePassword}
+                error={errors ? true : false}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
@@ -177,7 +177,9 @@ export default function SignIn({ setToken }) {
             >
               Войти
             </Button>
-            {/* <p className="register"><Link href="singin1/">Зарегистрироваться</Link></p> */}
+            <p className="register">
+              <Link to="signup/">Зарегистрироваться</Link>
+            </p>
             <h3 className="form_text_">ИЛИ</h3>
             <FcGoogle className="icon" />
             <FaRegistered className="icon" />
@@ -202,6 +204,10 @@ const Wrapper = styled.section`
   width: 100%;
   justify-content: center;
   align-items: center;
+  .signin_error {
+    text-align: center;
+    color: red;
+  }
   .wrapper {
     display: flex;
   }

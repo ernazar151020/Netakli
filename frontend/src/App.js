@@ -13,26 +13,30 @@ import PrivateRoute from "./pages/PrivateRoute";
 import useToken from "./components/useToken";
 
 function App() {
-  const { token, setToken } = useToken();
+  const { setToken } = useToken();
   const [categoryText, setCategoryText] = useState("");
   const [users, setUsers] = useState(localStorage.getItem("jwtTokens"));
+  const [currentCategory, setCurrentCategory] = useState({});
+  console.log(currentCategory);
   // if (!token) {
   //   return <SignIn setToken={setToken} />;
   // }
-
+  const token = localStorage.getItem("jwtToken");
   return (
     <Router>
-      <FooterNavbar />
+      {token && <FooterNavbar />}
+
       <Switch>
         <PrivateRoute path="/" exact>
-          <Home setCategoryText={setCategoryText} />
+          <Home
+            currentCategory={currentCategory}
+            setCurrentCategory={setCurrentCategory}
+          />
         </PrivateRoute>
         <PrivateRoute path="/profile" exact>
           <Profile />
         </PrivateRoute>
-        <PrivateRoute path="/chat" exact>
-          <Chat1 categoryText={categoryText} />
-        </PrivateRoute>
+        <PrivateRoute path="/chat/:slug" exact component={Chat1}></PrivateRoute>
         <PrivateRoute path="/begin" exact></PrivateRoute>
         <PrivateRoute path="/search" exact>
           <Search />
@@ -42,10 +46,12 @@ function App() {
         </PrivateRoute>
         <PrivateRoute path="/auth" exact></PrivateRoute>
         <Route path="/signin" exact>
+          /
           <SignIn setToken={setToken} token={token} />
         </Route>
         <Route path="/signup" exact>
-          <SignUp setUsers={setUsers} users={setUsers} />
+          {/* <SignUp setUsers={setUsers} users={setUsers} /> */}
+          <SignUp />
         </Route>
       </Switch>
     </Router>

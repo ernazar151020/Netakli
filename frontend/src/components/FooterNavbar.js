@@ -14,7 +14,8 @@ import useToken from "../components/useToken";
 // import SignIn from "../components/SignIn";
 
 const FooterNavbar = (props) => {
-  const { token, setToken } = useToken();
+  // const { token, setToken } = useToken();
+  const token = localStorage.getItem("jwtToken");
 
   const logOut = (e) => {
     e.preventDefault();

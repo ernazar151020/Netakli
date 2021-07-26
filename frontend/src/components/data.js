@@ -9,16 +9,15 @@ import { GrTechnology } from "react-icons/gr";
 import useToken from "./useToken";
 
 async function getRequest(token, url) {
-    return fetch(`http://localhost:8000/api/v1/${url}/`, {
+  return fetch(`http://localhost:8000/api/v1/${url}/`, {
     method: "GET",
-    credentials: 'omit',
+    credentials: "omit",
     headers: {
-      'Authorization': `JWT ${token.access_token}`,
+      Authorization: `JWT ${token.access}`,
       "Content-Type": "application/json",
-      'Accept': "application/json",
+      Accept: "application/json",
     },
-  }
-  )
+  });
   // .then(function(response) {
   //   console.log(response.json())
   //   return response.json();
@@ -26,12 +25,12 @@ async function getRequest(token, url) {
   // .catch(function(error) {
   //   console.log('Request failed', error)
   // });
-  }
+}
 
 export const CategoryData = async () => {
-    const { token } = useToken();
-    return await getRequest(token, 'total-theme-list');
-}
+  const { token } = useToken();
+  return await getRequest(token, "total-theme-list");
+};
 
 // export const categoryData = [
 //  {

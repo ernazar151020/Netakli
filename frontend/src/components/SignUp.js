@@ -15,6 +15,7 @@ import { FcGoogle } from "react-icons/fc";
 import PropTypes from "prop-types";
 import loginUser from "./SignIn";
 import aiosInstance from "../components/http-common";
+import { Redirect } from "react-router-dom";
 const useStyles = makeStyles((theme) => ({
   root: {
     "& .MuiTextField-root": {
@@ -24,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignIn1(props, { setToken }) {
-  const { setUsers, users } = props;
+  // const { setUsers, users } = props;
   const [username, setUsername] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
@@ -34,6 +35,7 @@ export default function SignIn1(props, { setToken }) {
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState(null);
 
+  const jwtToken = localStorage.getItem("jwtToken");
   // const [users, setUsers] = useState(localStorage.getItem("jwtTokens"));
 
   // *********FUNCTIONS***************------------***********
@@ -54,6 +56,9 @@ export default function SignIn1(props, { setToken }) {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!username && !password1 && !password2) {
+      return setErrors("Поле не может быть пустыми");
+    }
     const resonse = aiosInstance
       .post("accounts/registration/", {
         username,
@@ -61,19 +66,16 @@ export default function SignIn1(props, { setToken }) {
         password2,
       })
       .then((data) => {
-        // console.log(data.data);
         setErrors(null);
-        setUsers(...users, {
-          jwt: localStorage.setItem("jwtTokens", JSON.stringify(data.data)),
-        });
+        localStorage.setItem("jwtToken", JSON.stringify(data.data));
       })
+      .then(() => window.location.replace("/"))
       .catch((err) => {
-        setErrors({ fail: err.response });
-        console.log(err.response);
+        setErrors(err.response);
+        // console.log(err.response);
         // setErrors("");
       });
   };
-  console.log(errors);
 
   const handleClickShowPassword1 = () => {
     setShowPassword1(!showPassword1);
@@ -91,15 +93,18 @@ export default function SignIn1(props, { setToken }) {
     event.preventDefault();
   };
   const classes = useStyles();
-  useEffect(() => {
-    // if (localStorage.getItem("jwtToken") !== null) {
-    //   window.location.replace("http://localhost:3000/");
-    //   window.location.replace("http://localhost:3001/");
-    // } else {
-    //   setLoading(false);
-    // }
-    console.log(localStorage.getItem("jwtToken") !== null);
-  }, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem("jwtToken") !== null) {
+  //     window.location.replace("http://localhost:3000/");
+  //     // window.location.replace("http://localhost:3001/");
+  //   } else {
+  //     setLoading(false);
+  //   }
+  //   console.log(localStorage.getItem("jwtToken") !== null);
+  // }, []);
+  if (jwtToken) {
+    return <Redirect to="/" />;
+  }
   // ***************BODY**************-------___---------____-__-_--_----___-__
   return (
     <Wrapper>
@@ -117,16 +122,12 @@ export default function SignIn1(props, { setToken }) {
               <code>{resp}</code>
             </div>
           )} */}
-          <p className="signup_error">
-            {errors ? errors.fail.data.password : ""}
-          </p>
+          <p className="signup_error">{errors ? errors.data.password : ""}</p>
           {/* <p className="signup_error">{errors ? errors : " "}</p> */}
 
           <Input
             label={
-              errors
-                ? errors.fail.data.username
-                : "Введите адрес электроной почты"
+              errors ? errors.data.username : "Введите адрес электроной почты"
             }
             id="outlined-size-small"
             defaultValue=""
@@ -219,7 +220,6 @@ export default function SignIn1(props, { setToken }) {
             Войти через Google
           </button>
         </form>
-        }
       </div>
     </Wrapper>
   );
