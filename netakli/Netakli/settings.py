@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware'
 ]
 
 ROOT_URLCONF = 'Netakli.urls'
@@ -165,3 +166,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 USER_ONLINE_TIMEOUT = 20
+
+LANGUAGE_CODE = "es-es"
+

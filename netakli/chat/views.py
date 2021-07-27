@@ -29,10 +29,11 @@ def get_filter_by_total(request, slug):
         raise ValidationError('Переданной общей темы не существует')
 
 
-class ThemeViewSet(IsOnline, ModelViewSet):
+class ThemeViewSet(ModelViewSet):
     queryset = TalkTheme.objects.all()
     serializer_class = ThemeSerializer
-    permission_classes = [IsAuthenticated]   
+    permission_classes = [IsAuthenticated]
+    
 
     @staticmethod
     def _get_filter_title(title):
@@ -67,7 +68,7 @@ class ThemeViewSet(IsOnline, ModelViewSet):
             except:
                 raise ValidationError('Данной темы для обсуждения не нашлось', status.HTTP_404_NOT_FOUND)
         if not self.queryset:
-            raise ValidationError('Пока никто не создал тему для обсуждения', status.HTTP_404_NOT_FOUND)
+            raise ValidationError({'detail': 'Пока никто не создал тему для обсуждения'}, status.HTTP_404_NOT_FOUND)
 
     @action(methods=['GET'], detail=True)
     def random_chat(self, request, slug):

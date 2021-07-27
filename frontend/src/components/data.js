@@ -13,7 +13,7 @@ async function getRequest(token, url) {
     method: "GET",
     credentials: "omit",
     headers: {
-      Authorization: `JWT ${token.access}`,
+      Authorization: `JWT ${token}`,
       "Content-Type": "application/json",
       Accept: "application/json",
     },

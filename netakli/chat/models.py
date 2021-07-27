@@ -29,7 +29,7 @@ class TalkTheme(models.Model):
     title = models.CharField(max_length=250, verbose_name='Наименование')
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='author')
-    users = models.ManyToManyField(Profile, related_name='participants')
+    users = models.ManyToManyField(Profile, related_name='participants', blank=True)
     busy = models.BooleanField(default=False)
 
     def check_to_busy(self):

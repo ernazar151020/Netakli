@@ -21,7 +21,7 @@ function App() {
   // if (!token) {
   //   return <SignIn setToken={setToken} />;
   // }
-  const token = localStorage.getItem("jwtToken");
+  const token = localStorage.getItem("access");
   return (
     <Router>
       {token && <FooterNavbar />}

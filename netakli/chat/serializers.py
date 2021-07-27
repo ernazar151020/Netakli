@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework import status
 
 from .models import TalkTheme, TotalTheme
 
@@ -18,11 +19,18 @@ class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TalkTheme
         fields = ['total_theme', 'created_at', 'title', 'busy', 'send_to']
+    
+    def validate_total_theme(self, total_theme):
+        try: 
+            TotalTheme.objects.get(slug=total_theme)
+        except:
+            raise serializers.ValidationError({'total_theme': 'Переданной общей тематики не существует'}, 
+                                              code=status.HTTP_404_NOT_FOUND)
+        return total_theme
+
 
     def create(self, validated_data):
         request = self.context.get('request')
-        slug = self.context.get('slug')
-        total_theme = TotalTheme.objects.get(slug=slug)
-        theme = TalkTheme.objects.create(total_theme=total_theme, **validated_data)
+        theme = TalkTheme.objects.create(**validated_data)
         theme.users.add(request.user)
         return theme

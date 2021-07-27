@@ -13,29 +13,25 @@ const Chat = (props) => {
   const [messages, setMessages] = useState([]);
   const [show, setShow] = useState(false);
   const [resp, setResponse] = useState(null);
-
-  // useEffect(() => {
-  //   db.collection("messages")
-  //     .orderBy("createdAt")
-  //     .limit(50)
-  //     .onSnapshot((snapshot) => {
-  //       setMessages(snapshot.docs.map((doc) => doc.data()));
-  //     });
-  // }, []);
+  const [theme, setTheme] = useState([]);
+  const [newTheme, setNewTheme] = useState("");
 
   const fetchTheme = () => {
     axiosInstance
       .get(`filter_by_total/${slug}/`)
       .then((data) => {
+        setTheme(data.data)
         console.log(data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
+  
   useEffect(() => {
     fetchTheme();
   }, []);
+
   const handleThemeCreate = (event) => {
     event.preventDefault();
     if (show === false) {
@@ -44,6 +40,29 @@ const Chat = (props) => {
       setShow(false);
     }
   };
+  const createTheme = (event) => {
+    event.preventDefault();
+    const token = JSON.parse(localStorage.getItem('jwtToken')).access
+    console.log();
+    axiosInstance.post('theme/', 
+    {
+      data: { 
+            title: newTheme, total_theme: slug
+           }
+    }, 
+    {
+      headers: {
+                'Authentication': `JWT ${token}`
+                }
+    }
+                        )
+    .then((data) => {
+      setTheme(data.data)
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
 
   return (
     <Wrapper>
@@ -67,7 +86,11 @@ const Chat = (props) => {
           </div>
           <div className="new_theme">
             {show === true && (
-              <form>
+              <form
+                noValidate
+                autoComplete="off"
+                onSubmit={createTheme}
+              >
                 <input
                   type="text"
                   placeholder="Ввведите тему разговора"
@@ -81,15 +104,15 @@ const Chat = (props) => {
                 </button>
               </form>
             )}
-            {resp && (
               <ul className="theme-list">
-                resp
-                <li className="list-item">Как быстро выучить js</li>
-                <li className="list-item">20 лет в php коту под хвост</li>
+                {theme.map((item) => {
+                  const { title, created_at } = item;
+                  return (
+                    <li className="list-item">{title} <p>{created_at}</p></li>
+                  );
+                })}
                 <li className="my-theme">Говнокодер в реале красавчик</li>
-                <li className="list-item">Хочу бросить программирование</li>
               </ul>
-            )}
           </div>
         </div>
         <div className="container-messages">
