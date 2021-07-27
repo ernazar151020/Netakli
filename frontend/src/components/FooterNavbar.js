@@ -15,10 +15,9 @@ import { useParams, useLocation, useRouteMatch } from "react-router-dom";
 const FooterNavbar = (props) => {
   const token = localStorage.getItem("jwtToken");
   let slug = useLocation();
-  console.log(slug);
   const logOut = (e) => {
     e.preventDefault();
-    return fetch("http://localhost:8000/api/v1/accounts/dj-rest-auth/logout/", {
+    return fetch("http://localhost:8000/api/v1/accounts/logout/", {
       method: "POST",
       credentials: "omit",
       headers: {
