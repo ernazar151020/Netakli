@@ -22,7 +22,7 @@ import {
 import PropTypes from "prop-types";
 // import useToken from "../components/useToken";
 import { FcGoogle } from "react-icons/fc";
-import http from "../components/http-common";
+import http from "../axiosApi";
 
 const useStyles = makeStyles((theme) => ({
   root: {

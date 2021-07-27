@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { CategoryData } from "./data.js";
 import { useHistory } from "react-router";
-import axiosInstance from "./http-common";
+import axiosInstance from "../axiosApi";
 const Home = (props) => {
   const history = useHistory();
   const [loading, setLoading] = useState(false);

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework import status
 
-from .models import TalkTheme, TotalTheme
+from .models import TalkTheme, TotalTheme, Message
 
 
 class TotalThemeSerializer(serializers.ModelSerializer):
@@ -15,22 +15,31 @@ class TotalThemeSerializer(serializers.ModelSerializer):
         representation['image'] = request.build_absolute_uri(instance.image.url)
         return representation
 
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'
+
+
 class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TalkTheme
-        fields = ['total_theme', 'created_at', 'title', 'busy', 'send_to']
+        fields = ['total_theme', 'created_at', 'title', 'busy']
     
-    def validate_total_theme(self, total_theme):
-        try: 
-            TotalTheme.objects.get(slug=total_theme)
-        except:
-            raise serializers.ValidationError({'total_theme': 'Переданной общей тематики не существует'}, 
-                                              code=status.HTTP_404_NOT_FOUND)
-        return total_theme
+    # def validate_total_theme(self, total_theme):
+    #     try: 
+    #         TotalTheme.objects.get(slug=str(total_theme))
+    #     except:
+    #         raise serializers.ValidationError({'total_theme': 'Переданной общей тематики не существует'}, 
+    #                                           code=status.HTTP_404_NOT_FOUND)
+    #     return total_theme
 
 
     def create(self, validated_data):
         request = self.context.get('request')
-        theme = TalkTheme.objects.create(**validated_data)
+        user = request.user
+        theme = TalkTheme.objects.create(author=user, **validated_data)
         theme.users.add(request.user)
         return theme
+

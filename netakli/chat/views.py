@@ -48,7 +48,7 @@ class ThemeViewSet(ModelViewSet):
         Создание темы с проверкой на цензуру
         """
         title = request.data.get('title')
-        if self._get_filter_title(title):
+        if not self._get_filter_title(title):
             return super().create(request, *args, **kwargs)
         raise ValidationError('Вам стоит сменить наименование темы!', status.HTTP_400_BAD_REQUEST)
 

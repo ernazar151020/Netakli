@@ -5,7 +5,7 @@ import styled from "styled-components";
 import IconButton from "@material-ui/core/IconButton";
 import AddOutlinedIcon from "@material-ui/icons/AddOutlined";
 import ArrowBackOutlinedIcon from "@material-ui/icons/ArrowBackOutlined";
-import axiosInstance from "../http-common";
+import axiosInstance from "../../axiosApi";
 import { Link } from "react-router-dom";
 
 const Chat = (props) => {
@@ -43,27 +43,14 @@ const Chat = (props) => {
   const createTheme = (event) => {
     event.preventDefault();
     const token = JSON.parse(localStorage.getItem("jwtToken")).access;
-    console.log();
+    console.log(slug);
     axiosInstance
-      .post(
-        "theme/",
-        {
-          data: {
-            title: newTheme,
-            total_theme: slug,
-          },
-        },
-        {
-          headers: {
-            Authentication: `JWT ${token}`,
-          },
-        }
-      )
+      .post("theme/", { title: newTheme, total_theme: slug })
       .then((data) => {
         setTheme(data.data);
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.response);
       });
   };
 
@@ -94,7 +81,9 @@ const Chat = (props) => {
                   type="text"
                   placeholder="Ввведите тему разговора"
                   id="theme-create"
-                ></input>
+                  value={newTheme}
+                  onChange={(e) => setNewTheme(e.target.value)}
+                />
                 <button
                   style={{ marginLeft: "2px", height: "35px" }}
                   type="submit"

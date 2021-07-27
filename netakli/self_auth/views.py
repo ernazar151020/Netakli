@@ -1,11 +1,13 @@
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+
 from rest_framework import status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 
 from .models import Profile
 from .serialzers import RegistrationSerializer, ChangePasswordSerializer, UpdateUserSerializer, ProfileSerializer, \
@@ -15,6 +17,7 @@ from .validators import check_serializer
 
 class RegistrationView(APIView):
     serializer_class = RegistrationSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -43,6 +46,7 @@ class ChangePasswordView(UpdateAPIView):
 
 class ForgotPasswordView(APIView):
     serializer_class = ForgotPasswordSerializer
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.serializer_class(request.data, context={'request': request})
@@ -52,6 +56,7 @@ class ForgotPasswordView(APIView):
 class ChangeForgotPasswordView(UpdateAPIView):
     queryset = get_user_model().objects.all()
     serializer_class = ChangeForgotPasswordSerializer
+    permission_classes = (AllowAny,)
     lookup_url_kwarg = 'activation_code'
 
 
