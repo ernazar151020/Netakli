@@ -70,13 +70,17 @@ class ThemeViewSet(ModelViewSet):
         if not self.queryset:
             raise ValidationError({'detail': 'Пока никто не создал тему для обсуждения'}, status.HTTP_404_NOT_FOUND)
 
-    @action(methods=['GET'], detail=False)
-    def get_self_groups(self, request):
+    @action(methods=['GET'], detail=True)
+    def get_self_groups(self, slug, request):
+        """
+            Опция фильтрации бесед текущего пользователя
+        """
         try:
             profile = Profile.objects.get(user=request.user)
         except:
             profile = Profile.objects.create(user=request.user)
-        groups = self.queryset.filter(users=profile)
+        total_theme = TotalTheme.objects.get(slug=slug)
+        groups = self.queryset.filter(total_theme=total_theme, users=profile)
         serializer = self.serializer_class(instance=groups, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
