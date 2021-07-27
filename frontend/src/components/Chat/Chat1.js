@@ -16,8 +16,8 @@ const Chat = (props) => {
   const [theme, setTheme] = useState([]);
   const [newTheme, setNewTheme] = useState("");
 
-  const fetchTheme = () => {
-    axiosInstance
+  const fetchTheme = async () => {
+    await axiosInstance
       .get(`filter_by_total/${slug}/`)
       .then((data) => {
         setTheme(data.data);
@@ -41,9 +41,9 @@ const Chat = (props) => {
       setShow(false);
     }
   };
-  const createTheme = (event) => {
+  const createTheme = async (event) => {
     event.preventDefault();
-    axiosInstance
+    await axiosInstance
       .post("theme/", { title: newTheme, total_theme: slug })
       .then((data) => {
         setTheme(data.data);

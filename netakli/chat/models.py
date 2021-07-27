@@ -28,7 +28,7 @@ class TalkTheme(models.Model):
     total_theme = models.ForeignKey(TotalTheme, on_delete=models.CASCADE, related_name='total')
     title = models.CharField(max_length=250, verbose_name='Наименование')
     created_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='author')
+    author = models.ForeignKey(Profile, on_delete=models.DO_NOTHING, related_name='users')
     users = models.ManyToManyField(Profile, related_name='participants', blank=True)
     busy = models.BooleanField(default=False)
 
