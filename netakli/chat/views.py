@@ -10,7 +10,6 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .models import TalkTheme, Censorship, TotalTheme
 from .serializers import ThemeSerializer, TotalThemeSerializer
-from Netakli.permissions import IsOnline
 
 
 class TotalThemeAPIView(ReadOnlyModelViewSet):
@@ -24,15 +23,15 @@ def get_filter_by_total(request, slug):
         total_theme = TotalTheme.objects.get(slug=slug)
         theme = TalkTheme.objects.filter(total_theme=total_theme)
         serializer = ThemeSerializer(theme, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     except:
-        raise ValidationError('Переданной общей темы не существует')
+        raise ValidationError('Переданной общей темы не существует', code=status.HTTP_404_NOT_FOUND)
 
 
 class ThemeViewSet(ModelViewSet):
     queryset = TalkTheme.objects.all()
     serializer_class = ThemeSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     
 
     @staticmethod

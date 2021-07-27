@@ -51,5 +51,5 @@ class Message(models.Model):
     """
     body = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(Profile, on_delete=models.DO_NOTHING, related_name='author')
-    sending = models.ManyToManyField(TalkTheme, related_name='send_to', blank=True)
+    sending = models.ManyToManyField(TalkTheme, related_name='messages', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

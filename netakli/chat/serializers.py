@@ -25,7 +25,8 @@ class MessageSerializer(serializers.ModelSerializer):
 class ThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TalkTheme
-        fields = ['total_theme', 'created_at', 'title', 'busy']
+        fields = ['total_theme', 'created_at', 'title', 'busy', 'messages']
+        extra_kwargs = {'messages': {'required': False}}
     
     # def validate_total_theme(self, total_theme):
     #     try: 
@@ -35,7 +36,6 @@ class ThemeSerializer(serializers.ModelSerializer):
     #                                           code=status.HTTP_404_NOT_FOUND)
     #     return total_theme
 
-
     def create(self, validated_data):
         request = self.context.get('request')
         user = request.user
@@ -43,3 +43,10 @@ class ThemeSerializer(serializers.ModelSerializer):
         theme.users.add(request.user)
         return theme
 
+    def to_representation(self, instance):
+        request = self.context['request']
+        representation = super(ThemeSerializer, self).to_representation(instance)
+        representation['messages'] = MessageSerializer(instance.messages.all(),
+                                                       context={'request': request},
+                                                       many=True).data
+        return representation

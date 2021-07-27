@@ -25,6 +25,7 @@ const Chat = (props) => {
       })
       .catch((err) => {
         console.log(err);
+        console.log(err.response);
       });
   };
 
@@ -42,8 +43,6 @@ const Chat = (props) => {
   };
   const createTheme = (event) => {
     event.preventDefault();
-    const token = JSON.parse(localStorage.getItem("jwtToken")).access;
-    console.log(slug);
     axiosInstance
       .post("theme/", { title: newTheme, total_theme: slug })
       .then((data) => {
