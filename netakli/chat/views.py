@@ -22,9 +22,9 @@ def get_filter_by_total(request, slug):
     try:
         total_theme = TotalTheme.objects.get(slug=slug)
         theme = TalkTheme.objects.filter(total_theme=total_theme)
-        serializer = ThemeSerializer(theme, many=True , context={'request': request})
+        serializer = ThemeSerializer(theme, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    except:
+    except :
         raise ValidationError('Переданной общей темы не существует', code=status.HTTP_404_NOT_FOUND)
 
 

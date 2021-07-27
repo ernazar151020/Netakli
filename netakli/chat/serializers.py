@@ -1,10 +1,12 @@
-from rest_framework import serializers
-from rest_framework import status
+from rest_framework import serializers, status
 
 from .models import TalkTheme, TotalTheme, Message
+from self_auth.serialzers import ProfileSerializer
+from self_auth.models import Profile
 
 
 class TotalThemeSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = TotalTheme
         fields = '__all__'
@@ -23,30 +25,27 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ThemeSerializer(serializers.ModelSerializer):
+    author = ProfileSerializer(required=False)
+
     class Meta:
         model = TalkTheme
-        fields = ['total_theme', 'created_at', 'title', 'busy', 'messages']
-        extra_kwargs = {'messages': {'required': False}}
-    
-    # def validate_total_theme(self, total_theme):
-    #     try: 
-    #         TotalTheme.objects.get(slug=str(total_theme))
-    #     except:
-    #         raise serializers.ValidationError({'total_theme': 'Переданной общей тематики не существует'}, 
-    #                                           code=status.HTTP_404_NOT_FOUND)
-    #     return total_theme
+        fields = '__all__'
 
     def create(self, validated_data):
         request = self.context.get('request')
-        user = request.user
+        try:
+            user = Profile.objects.get(user=request.user)
+        except:
+            user = Profile.objects.create(user=request.user)
         theme = TalkTheme.objects.create(author=user, **validated_data)
-        theme.users.add(request.user)
+        theme.users.add(user)
         return theme
 
     def to_representation(self, instance):
         request = self.context['request']
         representation = super(ThemeSerializer, self).to_representation(instance)
-        representation['messages'] = MessageSerializer(instance.messages.all(),
-                                                       context={'request': request},
-                                                       many=True).data
+        if instance.messages.all():
+            representation['messages'] = MessageSerializer(instance.messages.all(),
+                                                           context={'request': request},
+                                                           many=True).data
         return representation

@@ -39,6 +39,7 @@ const Chat = (props) => {
         console.log(data);
         setTheme([{ data: data.data, title: themeTitle }, ...theme]);
       })
+
       .catch((err) => {
         console.log(err.response);
       });
@@ -78,9 +79,14 @@ const Chat = (props) => {
             )}
             <div className="chat_themes">
               <ul>
-                {/* {theme.map((item) => {
+                {theme.map((item) => {
                   console.log(item);
-                })} */}
+                  return (
+                    <li key={item.id} className="chat_themes_items">
+                      <a>{item.title}</a>
+                    </li>
+                  );
+                })}
                 <li></li>
               </ul>
             </div>
@@ -98,7 +104,7 @@ const Wrapper = styled.section`
   width: 100%;
   background-color: #e8e8e8;
   .chat_container {
-    max-width: 1300px;
+    max-width: 1500px;
     margin: 0 auto;
   }
   .chat_content {
@@ -106,7 +112,7 @@ const Wrapper = styled.section`
     grid-template-columns: 1fr 2fr 1fr;
   }
   .chat_content .chat_content_items {
-    height: 100vh;
+    /* height: calc(100vh - 100px); */
     border-right: 1px solid #0a0a0a;
     padding: 15px;
   }
@@ -141,5 +147,16 @@ const Wrapper = styled.section`
   }
   .chat_form button {
     margin-top: 10px;
+  }
+  .chat_themes_items {
+    list-style: none;
+    padding: 7px 15px;
+    background: grey;
+    margin: 5px 0;
+  }
+  .chat_themes {
+    height: calc(100vh - 200px);
+    overflow-y: scroll;
+    z-index: -1;
   }
 `;

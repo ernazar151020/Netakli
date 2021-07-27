@@ -11,23 +11,20 @@ import {
 import { RiContactsLine } from "react-icons/ri";
 import { Button } from "@material-ui/core";
 import useToken from "../components/useToken";
+import axiosInstance from "../axiosApi";
 import { useParams, useLocation, useRouteMatch } from "react-router-dom";
 const FooterNavbar = (props) => {
-  const token = localStorage.getItem("jwtToken");
-  let slug = useLocation();
+  const token = JSON.parse(localStorage.getItem("jwtToken")).refresh;
   const logOut = (e) => {
     e.preventDefault();
-    return fetch("http://localhost:8000/api/v1/accounts/logout/", {
-      method: "POST",
-      credentials: "omit",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    })
+    axiosInstance
+      .post("accounts/logout/", { refresh: token })
       .then(() => sessionStorage.clear())
       .then(() => localStorage.clear())
-      .then(() => window.location.replace("/signin"));
+      .then(() => window.location.replace("/signin"))
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -76,6 +73,7 @@ const FooterHeader = styled.nav`
   padding: 20px 0;
   bottom: 0;
   box-shadow: 0 9px 14px rgb(0, 0, 0);
+  background: #fff;
   width: 100%;
   .footer_nav_content {
     display: flex;
