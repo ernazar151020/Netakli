@@ -11,24 +11,19 @@ import {
 import { RiContactsLine } from "react-icons/ri";
 import { Button } from "@material-ui/core";
 import useToken from "../components/useToken";
+import axiosInstance from "../axiosApi";
 import { useParams, useLocation, useRouteMatch } from "react-router-dom";
 const FooterNavbar = (props) => {
-  const token = localStorage.getItem("jwtToken");
-  let slug = useLocation();
-  console.log(slug);
+  const token = JSON.parse(localStorage.getItem("jwtToken")).refresh;
   const logOut = (e) => {
     e.preventDefault();
-    return fetch("http://localhost:8000/api/v1/accounts/dj-rest-auth/logout/", {
-      method: "POST",
-      credentials: "omit",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
+    axiosInstance.post('accounts/logout/', {refresh: token})
+    .then(() => sessionStorage.clear())
+    .then(() => localStorage.clear())
+    .then(() => window.location.replace("/signin"))
+    .catch((err) => {
+        console.log(err);
     })
-      .then(() => sessionStorage.clear())
-      .then(() => localStorage.clear())
-      .then(() => window.location.replace("/signin"));
   };
 
   return (

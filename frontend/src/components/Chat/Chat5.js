@@ -20,7 +20,7 @@ const Chat = (props) => {
     await axiosInstance
       .get(`filter_by_total/${slug}/`)
       .then((data) => {
-        setTheme(data.data);
+        setTheme([data.data]);
         console.log(data);
       })
       .catch((err) => {
@@ -46,8 +46,11 @@ const Chat = (props) => {
     await axiosInstance
       .post("theme/", { title: newTheme, total_theme: slug })
       .then((data) => {
-        setTheme(data.data);
+      console.log(data.data)
+//        setTheme({data.data},...theme);
+setTheme([{data:data.data,title:newTheme, created_at: data.data.created_at},...theme])
       })
+
       .catch((err) => {
         console.log(err.response);
       });
@@ -94,6 +97,7 @@ const Chat = (props) => {
             <ul className="theme-list">
               {theme.map((item) => {
                 const { title, created_at } = item;
+                console.log(item)
                 return (
                   <li className="list-item">
                     {title} <p>{created_at}</p>

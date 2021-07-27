@@ -44,6 +44,9 @@ class TalkTheme(models.Model):
         else:
             self.paticipants.all().last().remove()
 
+    class Meta:
+        ordering = ['-created_at']
+
 
 class Message(models.Model):
     """
