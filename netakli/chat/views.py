@@ -53,6 +53,7 @@ class ThemeViewSet(ModelViewSet):
 
     def _error_if_not_theme(self, pk=None, total_theme=None):
         """
+
         проверка на действительность
         """
         if total_theme and pk:
@@ -68,6 +69,16 @@ class ThemeViewSet(ModelViewSet):
                 raise ValidationError('Данной темы для обсуждения не нашлось', status.HTTP_404_NOT_FOUND)
         if not self.queryset:
             raise ValidationError({'detail': 'Пока никто не создал тему для обсуждения'}, status.HTTP_404_NOT_FOUND)
+
+    @action(methods=['GET'], detail=False)
+    def get_self_groups(self, request):
+        try:
+            profile = Profile.objects.get(user=request.user)
+        except:
+            profile = Profile.objects.create(user=request.user)
+        groups = self.queryset.filter(users=profile)
+        serializer = self.serializer_class(instance=groups, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(methods=['GET'], detail=True)
     def random_chat(self, request, slug):
