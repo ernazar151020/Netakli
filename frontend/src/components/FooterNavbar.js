@@ -11,12 +11,11 @@ import {
 import { RiContactsLine } from "react-icons/ri";
 import { Button } from "@material-ui/core";
 import useToken from "../components/useToken";
-// import SignIn from "../components/SignIn";
-
+import { useParams, useLocation, useRouteMatch } from "react-router-dom";
 const FooterNavbar = (props) => {
-  // const { token, setToken } = useToken();
   const token = localStorage.getItem("jwtToken");
-
+  let slug = useLocation();
+  console.log(slug);
   const logOut = (e) => {
     e.preventDefault();
     return fetch("http://localhost:8000/api/v1/accounts/dj-rest-auth/logout/", {
@@ -36,11 +35,16 @@ const FooterNavbar = (props) => {
     <FooterHeader>
       <div className="container">
         <div className="footer_nav_content">
-          <Tooltip title="CHAT">
-            <NavLink to="/chat" activeClassName={"active_button"} exact>
-              <BsChatSquareDots className="footer_navbar_icons" />
+          <Tooltip title="HOME">
+            <NavLink to="/" activeClassName={"active_button"} exact>
+              <AiOutlineHome className="footer_navbar_icons" />
             </NavLink>
           </Tooltip>
+          {/* <Tooltip title="CHAT">
+            <NavLink to={slug.pathname} activeClassName={"active_button"} exact>
+              <BsChatSquareDots className="footer_navbar_icons" />
+            </NavLink>
+          </Tooltip> */}
           <Tooltip title="SEARCH">
             <NavLink to="/search" activeClassName={"active_button"} exact>
               <BsSearch className="footer_navbar_icons" />

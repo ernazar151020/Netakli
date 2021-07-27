@@ -32,7 +32,7 @@ def get_filter_by_total(request, slug):
 class ThemeViewSet(ModelViewSet):
     queryset = TalkTheme.objects.all()
     serializer_class = ThemeSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
 
     @staticmethod

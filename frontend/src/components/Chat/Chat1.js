@@ -20,14 +20,14 @@ const Chat = (props) => {
     axiosInstance
       .get(`filter_by_total/${slug}/`)
       .then((data) => {
-        setTheme(data.data)
+        setTheme(data.data);
         console.log(data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  
+
   useEffect(() => {
     fetchTheme();
   }, []);
@@ -42,27 +42,30 @@ const Chat = (props) => {
   };
   const createTheme = (event) => {
     event.preventDefault();
-    const token = JSON.parse(localStorage.getItem('jwtToken')).access
+    const token = JSON.parse(localStorage.getItem("jwtToken")).access;
     console.log();
-    axiosInstance.post('theme/', 
-    {
-      data: { 
-            title: newTheme, total_theme: slug
-           }
-    }, 
-    {
-      headers: {
-                'Authentication': `JWT ${token}`
-                }
-    }
-                        )
-    .then((data) => {
-      setTheme(data.data)
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+    axiosInstance
+      .post(
+        "theme/",
+        {
+          data: {
+            title: newTheme,
+            total_theme: slug,
+          },
+        },
+        {
+          headers: {
+            Authentication: `JWT ${token}`,
+          },
+        }
+      )
+      .then((data) => {
+        setTheme(data.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <Wrapper>
@@ -86,11 +89,7 @@ const Chat = (props) => {
           </div>
           <div className="new_theme">
             {show === true && (
-              <form
-                noValidate
-                autoComplete="off"
-                onSubmit={createTheme}
-              >
+              <form noValidate autoComplete="off" onSubmit={createTheme}>
                 <input
                   type="text"
                   placeholder="Ввведите тему разговора"
@@ -104,15 +103,17 @@ const Chat = (props) => {
                 </button>
               </form>
             )}
-              <ul className="theme-list">
-                {theme.map((item) => {
-                  const { title, created_at } = item;
-                  return (
-                    <li className="list-item">{title} <p>{created_at}</p></li>
-                  );
-                })}
-                <li className="my-theme">Говнокодер в реале красавчик</li>
-              </ul>
+            <ul className="theme-list">
+              {theme.map((item) => {
+                const { title, created_at } = item;
+                return (
+                  <li className="list-item">
+                    {title} <p>{created_at}</p>
+                  </li>
+                );
+              })}
+              <li className="my-theme">Говнокодер в реале красавчик</li>
+            </ul>
           </div>
         </div>
         <div className="container-messages">
