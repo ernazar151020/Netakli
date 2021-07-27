@@ -5,8 +5,9 @@ import styled from "styled-components";
 import IconButton from "@material-ui/core/IconButton";
 import AddOutlinedIcon from "@material-ui/icons/AddOutlined";
 import ArrowBackOutlinedIcon from "@material-ui/icons/ArrowBackOutlined";
-import axiosInstance from "../http-common";
+import axiosInstance from "../../axiosApi";
 import { Link } from "react-router-dom";
+
 
 const Chat = (props) => {
   const slug = props.match.params.slug;
@@ -44,24 +45,35 @@ const Chat = (props) => {
     event.preventDefault();
     const token = JSON.parse(localStorage.getItem('jwtToken')).access
     console.log();
-    axiosInstance.post('theme/', 
-    {
-      data: { 
-            title: newTheme, total_theme: slug
-           }
-    }, 
-    {
-      headers: {
-                'Authentication': `JWT ${token}`
-                }
+    try {
+      const response = axiosInstance.post('theme/',{
+                                            title: newTheme,
+                                            total_theme: slug
+                                          });
+      return response
+    } catch (error) {
+      console.log(error);
     }
-                        )
-    .then((data) => {
-      setTheme(data.data)
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+    // axiosInstance.post('theme/', 
+    // {
+    //   data: { 
+    //         title: newTheme, total_theme: slug
+    //         }
+    // }, 
+    // {
+    //   headers: {
+    //             "Content-type": "application/json",
+    //             Accept : 'application/json',
+    //             Authentication: `JWT ${token}`,
+    //             }
+    // }
+    //                     )
+    // .then((data) => {
+    //   setTheme(data.data)
+    // })
+    // .catch((err) => {
+    //   console.log(err);
+    // });
   }
 
   return (
@@ -104,6 +116,9 @@ const Chat = (props) => {
                 </button>
               </form>
             )}
+            <ul>
+              <li class="theme-list">Говнокодер в реале красавчик</li>
+            </ul>
               <ul className="theme-list">
                 {theme.map((item) => {
                   const { title, created_at } = item;
