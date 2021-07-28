@@ -77,7 +77,7 @@ class ThemeViewSet(ModelViewSet):
         if total_theme and pk:
             try:
                 total_theme = TotalTheme.objects.get(slug=total_theme)
-                self.queryset.get().get(total_theme=total_theme, pk=pk)
+                self.queryset.get(total_theme=total_theme, pk=pk)
             except:
                 raise ValidationError('Данной темы для обсуждения не нашлось', status.HTTP_404_NOT_FOUND)
         if pk:
