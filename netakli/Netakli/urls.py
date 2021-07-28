@@ -23,7 +23,8 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework.routers import DefaultRouter
 
-from chat.views import get_filter_by_total, ThemeViewSet, TotalThemeAPIView
+from chat.views import get_filter_by_total, ThemeViewSet, \
+    TotalThemeAPIView, get_self_groups, MessageViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -34,6 +35,7 @@ schema_view = get_schema_view(
 router = DefaultRouter()
 router.register('theme', ThemeViewSet)
 router.register('total-theme', TotalThemeAPIView)
+router.register('message', MessageViewSet)
 
 urlpatterns = [
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -41,6 +43,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/v1/accounts/", include("self_auth.urls")),
     path('api/v1/filter_by_total/<str:slug>/', get_filter_by_total, name='filter-by-total'),
+    path('api/v1/theme/get_self_groups/<str:slug>/', get_self_groups, name='filter-self-groups'),
     path('api/v1/', include(router.urls))
 ]
 

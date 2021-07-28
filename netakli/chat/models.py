@@ -32,6 +32,9 @@ class TalkTheme(models.Model):
     users = models.ManyToManyField(Profile, related_name='participants', blank=True)
     busy = models.BooleanField(default=False)
 
+    def __str__(self) -> str:
+        return self.title
+
     def check_to_busy(self):
         if int(self.participants.all().count()) == 2:
             self.busy = True

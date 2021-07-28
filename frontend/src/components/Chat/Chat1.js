@@ -1,22 +1,42 @@
 import React, { useState, useEffect } from "react";
 import { Button, Input, TextField } from "@material-ui/core";
-import SendMessages from "./SendMessages";
+// import SendMessages from "./SendMessages";
 import styled from "styled-components";
-import IconButton from "@material-ui/core/IconButton";
-import AddOutlinedIcon from "@material-ui/icons/AddOutlined";
-import ArrowBackOutlinedIcon from "@material-ui/icons/ArrowBackOutlined";
+// import IconButton from "@material-ui/core/IconButton";
+// import AddOutlinedIcon from "@material-ui/icons/AddOutlined";
+// import ArrowBackOutlinedIcon from "@material-ui/icons/ArrowBackOutlined";
 import axiosInstance from "../../axiosApi";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { MdPlaylistAdd } from "react-icons/md";
 import ChatForm from "./ChatForm";
 import ChatGroups from "./ChatGroups";
 import ChatMessage from "./ChatMessage";
+
+
 const Chat = (props) => {
+  
   const slug = props.match.params.slug;
   const [show, setShow] = useState(false);
   const [theme, setTheme] = useState([]);
   const [themeTitle, setThemeTitle] = useState("");
   const [scrollHeight, setScrollHeight] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [messages, setMessages] = useState([]);
+
+  const socketUrl = `ws://localhost:8000/theme/${slug}/`;
+
+  const themeSocket = new WebSocket(socketUrl);
+  
+  themeSocket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log(data.theme);
+    setTheme([{ id: data.theme.id, title: data.theme.title,
+                created_at: data.theme.created_at, author: data.theme.author.username }, ...theme]);
+  };
+  themeSocket.onclose = (e) => {
+    console.error('Chat socket closed unexpectedly');
+  };
+
   const fetchTheme = async () => {
     try {
       await axiosInstance.get(`filter_by_total/${slug}/`).then((data) => {
@@ -26,27 +46,54 @@ const Chat = (props) => {
     } catch (error) {
       console.log(error.response);
     }
+    try {
+      await axiosInstance.get(`theme/get_self_groups/${slug}/`).then((data) => {
+        console.log(data);
+        setGroups(data.data);
+      })
+    } catch (err) {
+      console.log(err.response)
+    }
   };
 
   useEffect(() => {
     fetchTheme();
   }, []);
 
+  const handleMessages = (event) => {
+    event.preventDefault();
+    const id = event.target.getAttribute('data-key');
+    axiosInstance.get(`theme/${id}/get_messages/`).then((data) => { 
+                  setMessages(data.data);
+                })
+                .catch((error) => {console.log(error);});
+  } 
+
   const createTheme = async (event) => {
     event.preventDefault();
-    await axiosInstance
-      .post("theme/", { title: themeTitle, total_theme: slug })
-      .then((data) => {
-        console.log(theme);
-        setTheme([{ data: data.data, title: themeTitle }, ...theme]);
-        setThemeTitle("");
-      })
-
-      .catch((err) => {
-        console.log(err.response);
-      });
+    await themeSocket.send(JSON.stringify({
+      title: themeTitle,
+    }));
+    setThemeTitle('');
+    // await axiosInstance
+    //   .post("theme/", { title: themeTitle, total_theme: slug })
+    //   .then((data) => {
+    //     console.log(theme);
+    //     setTheme([{ data: data.data, title: themeTitle }, ...theme]);
+    //     setGroups([{data: data.data, title: themeTitle}, ...groups]);
+    //     setThemeTitle("");
+    //   })
+    //   .catch((err) => {
+    //     console.log(err.response);
+    //   });
   };
 
+
+  // const getMessages = async (event) => {
+  //   event.preventDefault();
+  //   await axiosInstance
+  //     .get(`theme/$`)
+  // }
   const showForm = () => {
     setShow(!show);
     setScrollHeight(!scrollHeight);
@@ -75,7 +122,7 @@ const Chat = (props) => {
                   value={themeTitle}
                   onChange={(e) => setThemeTitle(e.target.value)}
                 />
-                <Button type="submit" variant="contained" color="primary">
+                <Button type="submit" id="create-theme" variant="contained" color="primary">
                   Создать Групп
                 </Button>
               </form>
@@ -84,8 +131,8 @@ const Chat = (props) => {
               className="chat_themes"
               style={{ height: `${scrollHeight ? "400px" : "480px"}` }}
             >
-              <ul>
-                <ChatGroups theme={theme} />
+              <ul id="theme-list">
+                <ChatGroups theme={theme}/>
               </ul>
             </div>
           </div>
@@ -94,12 +141,27 @@ const Chat = (props) => {
             <p className="message_content_subtitle">say hello!</p>
 
             <div className="message_content">
-              <ChatMessage />
+              <ul>
+              <ChatMessage messages={messages}/>
+              </ul>
               <div className="message_input">
                 <ChatForm />
               </div>
             </div>
             <div className="chat_content_items chat_person_content"></div>
+          </div>
+          <div className="chat_content_items chat_group_content">
+            <div className="chat_group_content_header">
+                  
+            </div>
+            <div
+              className="chat_themes"
+              style={{ height: `${scrollHeight ? "400px" : "480px"}` }}
+            >
+            <ul onClick={handleMessages}>
+                <ChatGroups theme={groups} />
+            </ul>
+            </div>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ class IsOnline(BasePermission):
 class IsAuthor(BasePermission):
     def has_object_permission(self, request, view, obj):
         try:
-            return request.user is obj.from_user
+            return request.user is obj.author
         except:
             return request.user.is_superuser
 
@@ -29,9 +29,9 @@ class InParticipantsPermission(BasePermission):
 class PermissionsMixin:
     def get_permissions(self):
         if self.action == 'create':
-            perm = [IsAuthenticated, InParticipantsPermission, IsOnline]
+            perm = [IsAuthenticated, ]
         elif self.action in ['update', 'partial_update', 'destroy']:
-            perm = [IsAuthenticated, InParticipantsPermission, IsAuthor, IsOnline]
+            perm = [IsAuthenticated, IsAuthor]
         else:
             perm = [IsAuthenticatedOrReadOnly, IsOnline]
         return [i() for i in perm]
