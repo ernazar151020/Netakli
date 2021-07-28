@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Chat1 from "./components/Chat/Chat1";
 import Profile from "./components/Profile";
 import FooterNavbar from "./components/FooterNavbar";
-import Home from "./components/Home";
+import Home from "./components/Home/Home";
 import Questions from "./components/Questions";
 import Search from "./components/Search";
 import SignIn from "./components/SignIn";
