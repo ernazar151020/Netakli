@@ -4,20 +4,29 @@ import styled from "styled-components";
 
 const SendMessages = () => {
   const [msg, setMsg] = useState("");
-  // const sendMessage = async (e) => {
-  //   e.preventDefault();
-  //   const { uid, photoURL } = auth.currentUser;
-  //   await db.collection("messages").add({
-  //     text: msg,
-  //     photoURL,
-  //     uid,
-  //     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-  //   });
-  //   setMsg("");
-  // };
+  const [messages, setMessages] = useState([]);
+  const socketUrlMessage = `ws://localhost:8000/send_message/${theme_id}/`;
+
+  const SendMessageSocket = new WebSocket(socketUrlMessage);
+  SendMessageSocket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log(data.theme);
+    setTheme([{ id: data.message.id, body: data.message.body, sending: data.message.sending,
+                created_at: data.message.created_at, author: data.message.author.username }, ...msg]);
+  };
+  SendMessageSocket.onclose = (e) => {
+    console.error('Chat socket closed unexpectedly');
+  };
+   const sendMessage = async (e) => {
+     e.preventDefault();
+     await SendMessageSocket.send(JSON.stringify({
+      body: msg,
+    }));
+     setMsg("");
+   };
   return (
     <Wrapper>
-      <form>
+      <form onSubmit={sendMessage}>
         <Input
           placeholder="Message..."
           value={msg}

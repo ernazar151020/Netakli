@@ -8,8 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .models import TalkTheme, Censorship, TotalTheme
-from .serializers import ThemeSerializer, TotalThemeSerializer
+from .models import TalkTheme, Censorship, TotalTheme, Message
+from .serializers import ThemeSerializer, TotalThemeSerializer, MessageSerializer
+from self_auth.models import Profile
+
+from Netakli.permissions import PermissionsMixin
 
 
 class TotalThemeAPIView(ReadOnlyModelViewSet):
@@ -28,11 +31,26 @@ def get_filter_by_total(request, slug):
         raise ValidationError('Переданной общей темы не существует', code=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['GET'])
+def get_self_groups(request, slug):
+    """
+        Опция фильтрации бесед текущего пользователя
+        по слагу общей тематики
+    """
+    try:
+        profile = Profile.objects.get(user=request.user)
+    except:
+        profile = Profile.objects.create(user=request.user)
+    total = TotalTheme.objects.get(slug=slug)
+    groups = TalkTheme.objects.filter(total_theme=total, users=profile)
+    serializer = ThemeSerializer(instance=groups, many=True, context={'request': request})
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class ThemeViewSet(ModelViewSet):
     queryset = TalkTheme.objects.all()
     serializer_class = ThemeSerializer
     permission_classes = [IsAuthenticated]
-    
 
     @staticmethod
     def _get_filter_title(title):
@@ -70,21 +88,7 @@ class ThemeViewSet(ModelViewSet):
         if not self.queryset:
             raise ValidationError({'detail': 'Пока никто не создал тему для обсуждения'}, status.HTTP_404_NOT_FOUND)
 
-    @action(methods=['GET'], detail=True)
-    def get_self_groups(self, slug, request):
-        """
-            Опция фильтрации бесед текущего пользователя
-        """
-        try:
-            profile = Profile.objects.get(user=request.user)
-        except:
-            profile = Profile.objects.create(user=request.user)
-        total_theme = TotalTheme.objects.get(slug=slug)
-        groups = self.queryset.filter(total_theme=total_theme, users=profile)
-        serializer = self.serializer_class(instance=groups, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(methods=['GET'], detail=True)
+    @action(methods=['POST'], detail=False)
     def random_chat(self, request, slug):
         """
         опция рандомного подбора чата
@@ -126,7 +130,16 @@ class ThemeViewSet(ModelViewSet):
         except:
             raise ValidationError('К сожалению чат уже занят', status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['GET'], detail=False)
+    @action(methods=['GET'], detail=True)
+    def get_messages(self, request, pk):
+        """
+        Опция вывода сообщений чата
+        """
+        messages = self.get_object().messages.all()
+        serializer = MessageSerializer(messages, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(methods=['GET'], detail=True)
     def logout_from_chat(self, request, pk):
         """
         опция выхода из чата
@@ -134,9 +147,25 @@ class ThemeViewSet(ModelViewSet):
         self._error_if_not_theme(pk=pk)
         try:
             chat = self.queryset.get(users__icontains=request.user, pk=pk)
-            chat.users.remove(request.user)
+            author = chat.author
+            for user in chat.users.all():
+                if user == request.user and request.user in chat.users.all():
+                    chat.users.remove(user)
+            if request.user == author and chat.user.all().first() is not None:
+                chat.update(creator=chat.user.all().first())
+            if chat.users.all().first() is None:
+                chat.users.add(author)
+                chat.messages.all().delete()
+                chat.delete()
+                return Response({'success': 'Вы успешно покинули чат'},
+                                status=status.HTTP_204_NO_CONTENT)
             chat.save()
             chat.check_to_busy()
-            return Response({'success': 'Вы успешно покинули чат'}, status=status.HTTP_200_OK)
+            return Response({'success': 'Вы успешно покинули чат'}, status=status.HTTP_204_NO_CONTENT)
         except:
             raise ValidationError('Произошла ошибка, попробуйте покинуть чат позже', status.HTTP_400_BAD_REQUEST)
+
+
+class MessageViewSet(PermissionsMixin, ModelViewSet):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer

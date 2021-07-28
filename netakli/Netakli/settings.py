@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
-
+    'channels',
     # my apps
     'self_auth',
     'chat'
@@ -81,7 +81,22 @@ TEMPLATES = [
     },
 ]
 
+redis_host = os.environ.get('REDIS_HOST', 'localhost')
 WSGI_APPLICATION = 'Netakli.wsgi.application'
+ASGI_APPLICATION = 'Netakli.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(redis_host, 6379)],
+        },
+    },
+}
+
+CELERY_RESULT_BACKEND = 'redis://' + redis_host + ':' + '6379' + '/0'
+
+
 
 
 # Database
@@ -173,4 +188,3 @@ CORS_ALLOWED_ORIGINS = [
 USER_ONLINE_TIMEOUT = 20
 
 LANGUAGE_CODE = "ru-ru"
-

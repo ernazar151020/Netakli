@@ -1,6 +1,10 @@
-import React from "react";
+import { Button } from "@material-ui/core";
+import React, { useState } from "react";
+import axiosInstance from "../../axiosApi";
+import ChatMessage from "./ChatMessage";
 
 const ChatGroups = (props) => {
+  const [themeId, setThemeId] = useState(null);
   return (
     <>
       {props.theme.map((item) => {
@@ -13,11 +17,11 @@ const ChatGroups = (props) => {
         });
         // const year = item.created_at.getFullYear();
         return (
-          <li key={item.id} className="chat_themes_items">
-            <div className="chat_themes_title">{item.title}</div>
-            <p className="chat_themes_date">
-              <span>{day}</span>
-              <span> {month}</span>
+          <li key={item.id} data-key={item.id} className="chat_themes_items">
+            <div data-key={item.id} className="chat_themes_title">{item.title}</div>
+            <p data-key={item.id} className="chat_themes_date">
+              <span data-key={item.id} >{day}</span>
+              <span data-key={item.id} > {month}</span>
             </p>
           </li>
         );
