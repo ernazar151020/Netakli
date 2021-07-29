@@ -6,7 +6,6 @@ import Profile from "./components/Profile";
 import FooterNavbar from "./components/FooterNavbar";
 import Home from "./components/Home/Home";
 import Questions from "./components/Questions";
-import Search from "./components/Search";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import PrivateRoute from "./pages/PrivateRoute";
@@ -38,9 +37,7 @@ function App() {
         </PrivateRoute>
         <PrivateRoute path="/chat/:slug" exact component={Chat1}></PrivateRoute>
         <PrivateRoute path="/begin" exact></PrivateRoute>
-        <PrivateRoute path="/search" exact>
-          <Search />
-        </PrivateRoute>
+
         <PrivateRoute path="/questions" exact>
           <Questions />
         </PrivateRoute>

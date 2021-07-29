@@ -23,7 +23,7 @@ const FooterNavbar = (props) => {
       .then(() => localStorage.clear())
       .then(() => window.location.replace("/signin"))
       .catch((err) => {
-        console.log(err);
+        console.log(err.response);
       });
   };
 

@@ -2,7 +2,6 @@ import React from "react";
 import axiosInstance from "../../axiosApi";
 
 const ChatMessage = (props) => {
-
   return (
     <>
       {props.messages.map((item) => {
@@ -16,10 +15,14 @@ const ChatMessage = (props) => {
         // const year = item.created_at.getFullYear();
         return (
           <li key={item.id} data-key={item.id} className="chat_themes_items">
-            <div data-key={item.id} className="chat_themes_title">{item.body}</div>
+            <div data-key={item.id} className="chat_themes_title">
+              {item.body}
+            </div>
             <p data-key={item.id} className="chat_themes_date">
-              <span data-key={item.id} >{item.author} {day}</span>
-              <span data-key={item.id} > {month}</span>
+              <span data-key={item.id}>
+                {item.author} {day}
+              </span>
+              <span data-key={item.id}> {month}</span>
             </p>
           </li>
         );

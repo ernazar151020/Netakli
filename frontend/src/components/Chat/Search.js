@@ -31,7 +31,6 @@ const Search = () => {
   const classes = useStyles();
   return (
     <Wrapper>
-      <div className="container">
         <div className="content">
           <form className="form">
             <Paper component="form" className={classes.root}>
@@ -54,14 +53,12 @@ const Search = () => {
             </Paper>
           </form>
         </div>
-      </div>
     </Wrapper>
   );
 };
 
 export default Search;
 const Wrapper = styled.section`
-padding: 50px 0;
   .content {
     display: flex;
     justify-content: center;

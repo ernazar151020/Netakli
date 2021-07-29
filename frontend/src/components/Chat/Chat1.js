@@ -11,10 +11,8 @@ import { MdPlaylistAdd } from "react-icons/md";
 import ChatForm from "./ChatForm";
 import ChatGroups from "./ChatGroups";
 import ChatMessage from "./ChatMessage";
-
-
+import Search from "./Search";
 const Chat = (props) => {
-  
   const slug = props.match.params.slug;
   const [show, setShow] = useState(false);
   const [theme, setTheme] = useState([]);
@@ -26,15 +24,22 @@ const Chat = (props) => {
   const socketUrl = `ws://localhost:8000/theme/${slug}/`;
 
   const themeSocket = new WebSocket(socketUrl);
-  
+
   themeSocket.onmessage = (event) => {
     const data = JSON.parse(event.data);
     console.log(data.theme);
-    setTheme([{ id: data.theme.id, title: data.theme.title,
-                created_at: data.theme.created_at, author: data.theme.author.username }, ...theme]);
+    setTheme([
+      {
+        id: data.theme.id,
+        title: data.theme.title,
+        created_at: data.theme.created_at,
+        author: data.theme.author.username,
+      },
+      ...theme,
+    ]);
   };
   themeSocket.onclose = (e) => {
-    console.error('Chat socket closed unexpectedly');
+    console.error("Chat socket closed unexpectedly");
   };
 
   const fetchTheme = async () => {
@@ -50,9 +55,9 @@ const Chat = (props) => {
       await axiosInstance.get(`theme/get_self_groups/${slug}/`).then((data) => {
         console.log(data);
         setGroups(data.data);
-      })
+      });
     } catch (err) {
-      console.log(err.response)
+      console.log(err.response);
     }
   };
 
@@ -62,19 +67,25 @@ const Chat = (props) => {
 
   const handleMessages = (event) => {
     event.preventDefault();
-    const id = event.target.getAttribute('data-key');
-    axiosInstance.get(`theme/${id}/get_messages/`).then((data) => { 
-                  setMessages(data.data);
-                })
-                .catch((error) => {console.log(error);});
-  } 
+    const id = event.target.getAttribute("data-key");
+    axiosInstance
+      .get(`theme/${id}/get_messages/`)
+      .then((data) => {
+        setMessages(data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const createTheme = async (event) => {
     event.preventDefault();
-    await themeSocket.send(JSON.stringify({
-      title: themeTitle,
-    }));
-    setThemeTitle('');
+    await themeSocket.send(
+      JSON.stringify({
+        title: themeTitle,
+      })
+    );
+    setThemeTitle("");
     // await axiosInstance
     //   .post("theme/", { title: themeTitle, total_theme: slug })
     //   .then((data) => {
@@ -87,7 +98,6 @@ const Chat = (props) => {
     //     console.log(err.response);
     //   });
   };
-
 
   // const getMessages = async (event) => {
   //   event.preventDefault();
@@ -122,7 +132,12 @@ const Chat = (props) => {
                   value={themeTitle}
                   onChange={(e) => setThemeTitle(e.target.value)}
                 />
-                <Button type="submit" id="create-theme" variant="contained" color="primary">
+                <Button
+                  type="submit"
+                  id="create-theme"
+                  variant="contained"
+                  color="primary"
+                >
                   Создать Групп
                 </Button>
               </form>
@@ -132,7 +147,7 @@ const Chat = (props) => {
               style={{ height: `${scrollHeight ? "400px" : "480px"}` }}
             >
               <ul id="theme-list">
-                <ChatGroups theme={theme}/>
+                <ChatGroups theme={theme} />
               </ul>
             </div>
           </div>
@@ -142,26 +157,15 @@ const Chat = (props) => {
 
             <div className="message_content">
               <ul>
-              <ChatMessage messages={messages}/>
+                <ChatMessage messages={messages} />
               </ul>
               <div className="message_input">
                 <ChatForm />
               </div>
             </div>
-            <div className="chat_content_items chat_person_content"></div>
           </div>
-          <div className="chat_content_items chat_group_content">
-            <div className="chat_group_content_header">
-                  
-            </div>
-            <div
-              className="chat_themes"
-              style={{ height: `${scrollHeight ? "400px" : "480px"}` }}
-            >
-            <ul onClick={handleMessages}>
-                <ChatGroups theme={groups} />
-            </ul>
-            </div>
+          <div className="chat_content_items chat_person_content">
+            <Search />
           </div>
         </div>
       </div>
@@ -191,7 +195,7 @@ const Wrapper = styled.section`
     grid-template-columns: 1fr 2fr 1fr;
   }
   .chat_content .chat_content_items {
-    /* height: calc(100vh - 100px); */
+    height: calc(100vh - 100px);
     border-right: 1px solid #0a0a0a;
     /* padding: 15px; */
   }
@@ -312,7 +316,7 @@ position: relative;
  
 }
 .message_content{
-  height: calc(100vh - 230px);
+  height: calc(100vh - 300px);
       overflow-y: scroll;
     /* z-index: -1; */
     overflow-y: visible;

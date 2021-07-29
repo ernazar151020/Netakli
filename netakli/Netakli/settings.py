@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     # my apps
     'self_auth',
     'chat'
-
 ]
 
 MIDDLEWARE = [
